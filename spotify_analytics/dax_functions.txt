@@ -1,0 +1,107 @@
+
+No of Albums = DISTINCTCOUNT(spotify_history[album_name])
+No of Artists = DISTINCTCOUNT(spotify_history[artist_name])
+No of Tracks = DISTINCTCOUNT(spotify_history[track_name])
+
+Hour = HOUR(spotify_history[Track Played Time])
+Max Year = MAX('Date Table'[Year])
+
+CurrentYearAlbums = 
+    VAR _CurrentYear = MAX('Date Table'[Year])
+RETURN
+    CALCULATE(DISTINCTCOUNT(spotify_history[album_name]), 'Date Table'[Year] = _CurrentYear)
+
+
+CurrentYearArtists = 
+    VAR _LatestYear = MAX('Date Table'[Year])
+RETURN
+    CALCULATE(DISTINCTCOUNT(spotify_history[artist_name]), 'Date Table'[Year] = _LatestYear)
+
+
+CurrentYearTracks = 
+    VAR _latest = MAX('Date Table'[Year])
+RETURN
+    CALCULATE(DISTINCTCOUNT(spotify_history[track_name]), 'Date Table'[Year] = _latest)
+
+
+MinMax Albums Line Chat = 
+    VAR _MaxValue = MAXX(ALLSELECTED('Date Table'[Year]),CALCULATE(DISTINCTCOUNT(spotify_history[album_name])))
+    VAR _MinValue = MINX(ALLSELECTED('Date Table'[Year]),CALCULATE(DISTINCTCOUNT(spotify_history[album_name])))
+    VAR _CurrentValue = DISTINCTCOUNT(spotify_history[album_name])
+RETURN
+    IF(_CurrentValue = _MaxValue || _CurrentValue = _MinValue, _CurrentValue, BLANK())
+
+MinMax Artists Line Chart = 
+    VAR _MaxValue = MAXX(ALLSELECTED('Date Table'[Year]), CALCULATE(DISTINCTCOUNT(spotify_history[artist_name])))
+    VAR _MinValue = MINX(ALLSELECTED('Date Table'[Year]), CALCULATE(DISTINCTCOUNT(spotify_history[artist_name])))
+    VAR _CurrentValue = DISTINCTCOUNT(spotify_history[artist_name])
+RETURN
+    IF(_CurrentValue = _MaxValue || _CurrentValue = _MinValue, _CurrentValue, BLANK())
+
+ MinMax Tracks Line Chat = 
+    VAR _MaxValue = MAXX(ALLSELECTED('Date Table'[Year]), CALCULATE(DISTINCTCOUNT(spotify_history[track_name])))
+    VAR _MinValue = MINX(ALLSELECTED('Date Table'[Year]), CALCULATE(DISTINCTCOUNT(spotify_history[track_name])))
+    VAR _CurrentValue = DISTINCTCOUNT(spotify_history[track_name])
+RETURN
+    IF(_CurrentValue = _MaxValue || _CurrentValue = _MinValue, _CurrentValue, BLANK())
+
+PreviousYearAlbums = 
+    VAR _LatestYear = MAX('Date Table'[Year])
+    VAR _PreviousYear = _LatestYear -1
+RETURN
+    CALCULATE(DISTINCTCOUNT(spotify_history[album_name]), 'Date Table'[Year] = _PreviousYear)
+
+PreviousYearArtists = 
+    VAR _LatestYear = MAX('Date Table'[Year])
+    VAR _PreviousYear = _LatestYear -1
+RETURN
+    CALCULATE(DISTINCTCOUNT(spotify_history[artist_name]), 'Date Table'[Year] = _PreviousYear)
+
+PreviousYearTracks = 
+    VAR _latest = MAX('Date Table'[Year])
+    VAR _previousYear = _latest -1
+RETURN
+    CALCULATE(DISTINCTCOUNT(spotify_history[track_name]), 'Date Table'[Year] = _previousYear)
+
+PY and YoY Albums KPI = 
+    VAR _latest = [CurrentYearAlbums]
+    VAR _previous = [PreviousYearAlbums]
+    VAR _YoY = IF(NOT(ISBLANK(_previous)), DIVIDE(_latest-_previous, _previous, 0), BLANK())
+RETURN
+    IF(NOT(ISBLANK(_previous)), 
+        "vs PY: " & FORMAT(_previous, "#,##0") & " (" & FORMAT(_YoY, "0.00%") & ")", "NO DATA")
+
+PY and YoY Artists KPI = 
+    VAR _Latest = [CurrentYearArtists]
+    VAR _Previous = [PreviousYearArtists]
+    VAR _YoY = IF(NOT(ISBLANK(_Previous)), DIVIDE(_Latest-_Previous,_Previous,0), BLANK())
+RETURN
+    IF(NOT(ISBLANK(_previous)), 
+        "vs PY: " & FORMAT(_previous, "#,##0") & " (" & FORMAT(_YoY, "0.00%") & ")", "NO DATA")
+
+PY and YoY Tracks KPI = 
+    VAR _latest = [CurrentYearTracks]
+    VAR _previous = [PreviousYearTracks]
+    VAR _YoY = IF(NOT(ISBLANK(_previous)), DIVIDE(_latest-_previous, _previous, 0), BLANK())
+RETURN
+    IF(NOT(ISBLANK(_previous)), 
+        "vs PY: " & FORMAT(_previous, "#,##0") & " (" & FORMAT(_YoY, "0.00%") & ")", "NO DATA")
+
+CF Quadrant = 
+    VAR AvgTime = [Avg Listening time in mins] <= 'Average Listening Time (min)'[Average Listening Time (min) Value]
+    VAR TrackFreq = [Track Frequency] >= 'Track Frequency (Parameter)'[Track Frequency (Parameter) Value]
+    VAR Result = 
+    SWITCH(
+            TRUE(), 
+            AvgTime && TrackFreq, 1, -- Low Time and High Frequency
+            NOT AvgTime && TrackFreq, 2, -- High Time and High Frequency
+            NOT AvgTime && NOT TrackFreq, 3, -- High Time and Low Frequency
+            AvgTime && NOT TrackFreq, 4 -- Low Time, Low Frequency
+    )
+RETURN
+    Result
+
+
+Avg Listening time in mins = AVERAGE(spotify_history[ms_played])/60000   
+Track Frequency (Parameter) Value = SELECTEDVALUE('Track Frequency (Parameter)'[Track Frequency (Parameter)])
+Average Listening Time (min) Value = SELECTEDVALUE('Average Listening Time (min)'[Average Listening Time (min)])    
