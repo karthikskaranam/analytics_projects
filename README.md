@@ -9,7 +9,8 @@ Exploratory Data Analysis of US American Airlines Financial Performance - A comp
 #### Project files: [Link](https://github.com/karthikskaranam/analytics_projects/tree/main/airline_analytics)
 #### Overview: 
 
-#### ![image](https://github.com/user-attachments/assets/f6e2e62a-2f8b-4932-9a30-0063a69ec2f8)
+#### ![image](https://github.com/user-attachments/assets/88329b83-0a0e-43bd-bcc2-a8daa6993809)
+
 
 
 ## Churn Analysis
