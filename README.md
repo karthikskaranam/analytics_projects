@@ -22,7 +22,7 @@ Developing Predictive Models to Identify At-Risk Customers and Reduce Churn Rate
 #### Project files: [Link](https://github.com/karthikskaranam/analytics_projects/tree/main/churn_analysis-main)
 #### Overview: 
 
-#### (![image](https://github.com/user-attachments/assets/15fee8e0-06eb-40bf-ab9c-035aa7a819de)
+#### ![image](https://github.com/user-attachments/assets/15fee8e0-06eb-40bf-ab9c-035aa7a819de)
 
 ## Sales Analysis
 
